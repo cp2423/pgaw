@@ -1,0 +1,48 @@
+services:
+  db:
+    build: db
+    restart: always
+    # image manual says to set shared memory limit
+    shm_size: 128mb
+    # expose port for direct connections
+    ports:
+      - 5432:5432
+    networks:
+      - backnet
+    environment:
+      - POSTGRES_DB=adventureworks
+      - POSTGRES_PASSWORD=hophophop
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: backend
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - backnet
+      - frontnet
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@foo.com
+      - PGADMIN_DEFAULT_PASSWORD=hophophop
+      #- PGADMIN_LISTEN_PORT=5050
+    deploy:
+      replicas: 4
+
+  proxy:
+    build: proxy
+    restart: always
+    ports:
+    - 80:80
+    depends_on:
+    - backend
+    networks:
+    - frontnet
+
+networks:
+  backnet:
+  frontnet:
+
+volumes:
+  pgdata:
