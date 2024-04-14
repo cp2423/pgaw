@@ -26,9 +26,10 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@foo.com
       - PGADMIN_DEFAULT_PASSWORD=hophophop
-      #- PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_LISTEN_PORT=5050
+      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
     deploy:
-      replicas: 4
+      replicas: 3
 
   proxy:
     build: proxy
