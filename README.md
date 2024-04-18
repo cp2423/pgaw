@@ -73,6 +73,53 @@ The key was adding `ip_hash;` as the documentation (link below)
 explains this ensures requests from the same source are routed
 to the same backend instance.
 
+The `Dockerfile` for nginx simply copies the config file from the db
+directory into the container.
+
+### pgadmin config notes
+
+Really the whole point of this exercise was to practise building a
+"resilient" server using Docker since previous experience of 
+pgadmin has shown that a large and/or poorly written query can
+cause this to eat up all the memory leading to OOM and a dead 
+server.
+
+I believed that Docker could be used to mitigtate for this by:
+
+1. having mutliple pgadmin containers to spread the load
+2. limiting the amount of memory each pgadmin could use and
+which would cauase that single instance to die gracefully
+without taking down the server with it.
+
+The first part was simple using the `replicas` instruction in
+compose to create three identical pgadmin containers. By having
+multiple instances, if one dies, the others continue so only the
+user(s) contected to the dead instance will be affected as it
+resurrects itself.
+
+Getting memory limits to work was challenging, firstly 
+because of `cgroups` being disabled in the OS (see above).
+Then there was some confusion over wether the compose 
+settings for memory limits now only apply to docker swarm.
+In the end, using lowercase `m` to signify megabytes in
+the compose file seemed to make all the difference. This
+can be tested by running `docker stats` in parallel when 
+the containers are up, which clearly shows the maximum 
+amount of memory each container is allowed.
+
+### postgres config notes
+
+The [release notes](https://hub.docker.com/_/postgres) of the
+postgres docker image clearly explain the ways in which it 
+can be used. Here an init script is used to make sure that 
+a new user and then the data is added to the Adventureworks
+database.
+
+This image is smart. On first run, it runs the init script
+and creates the database, which takes a little while. On future
+runs if it sees a database is already present in the mounted 
+volume these steps are skipped, thus providing persistence.
+
 ## Useful resources
 https://kbroman.org/github_tutorial/ = clearly written guide helped jog the
 memory about getting git working
