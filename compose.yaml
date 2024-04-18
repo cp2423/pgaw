@@ -30,6 +30,10 @@ services:
       - PGADMIN_LISTEN_ADDRESS=0.0.0.0
     deploy:
       replicas: 3
+      resources:
+         limits:
+            cpus: '0.5'
+            memory: 400m
 
   proxy:
     build: proxy
