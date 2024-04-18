@@ -1,6 +1,6 @@
 upstream backend {
     ip_hash;
-    server backend:5050;
+    server backend;
 }
 
 server {

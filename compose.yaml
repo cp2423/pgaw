@@ -26,12 +26,11 @@ services:
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@foo.com
       - PGADMIN_DEFAULT_PASSWORD=hophophop
-      - PGADMIN_LISTEN_PORT=5050
-      - PGADMIN_LISTEN_ADDRESS=0.0.0.0
     deploy:
       replicas: 3
       resources:
          limits:
+            # appropriate for a 2GB RPi
             cpus: '0.5'
             memory: 400m
 
