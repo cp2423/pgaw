@@ -12,6 +12,12 @@ Building a containerised solution using Docker should be able to mitigate
 this. I also wanted to gain some more experience playing around with Docker
 and Compose.
 
+Key lessons:
+- **Docker Compose** in particular lifecycle of a container eg effect of
+`up`, `down`, `down -v` (which will remove volumes too which was necessary
+to recreate the database) also faffing around with replicas and secrets
+- **Architecture** making nginx load balancing work across a Docker network
+
 ## Prerequesites
 
 This is an overview of the steps taken to set up this project.

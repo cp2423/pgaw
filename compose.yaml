@@ -11,7 +11,11 @@ services:
       - backnet
     environment:
       - POSTGRES_DB=adventureworks
-      - POSTGRES_PASSWORD=hophophop
+      - POSTGRES_PASSWORD=/run/secrets/dbroot
+      - READONLY_PWD_FILE=/run/secrets/readonly
+    secrets:
+      - dbroot
+      - readonly
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -25,7 +29,9 @@ services:
       - frontnet
     environment:
       - PGADMIN_DEFAULT_EMAIL=admin@foo.com
-      - PGADMIN_DEFAULT_PASSWORD=hophophop
+      - PGADMIN_DEFAULT_PASSWORD_FILE=/run/secrets/pgadmin
+    secrets:
+      - pgadmin
     deploy:
       replicas: 3
       resources:
@@ -47,6 +53,14 @@ services:
 networks:
   backnet:
   frontnet:
+
+secrets:
+  dbroot:
+    file: ../passwords/dbroot.txt
+  readonly:
+    file: ../passwords/readonly.txt
+  pgadmin:
+    file: ../passwords/pgadmin.txt
 
 volumes:
   pgdata:

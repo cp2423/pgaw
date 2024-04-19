@@ -11,7 +11,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 	NOREPLICATION
 	NOBYPASSRLS
 	CONNECTION LIMIT -1
-	PASSWORD 'readonly@GBS';
+	PASSWORD '`cat $READONLY_PWD_FILE`' ;
 
 	GRANT pg_read_all_data TO readonly;
 EOSQL
