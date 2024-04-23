@@ -9,6 +9,10 @@ services:
       - 5432:5432
     networks:
       - backnet
+    command: >
+      -c ssl=on
+      -c ssl_cert_file=/run/secrets/sslcert
+      -c ssl_key_file=/run/secrets/sslkey
     environment:
       - POSTGRES_DB=adventureworks
       - POSTGRES_PASSWORD=/run/secrets/dbroot
@@ -16,6 +20,8 @@ services:
     secrets:
       - dbroot
       - readonly
+      - sslcert
+      - sslkey
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -33,7 +39,7 @@ services:
     secrets:
       - pgadmin
     deploy:
-      replicas: 3
+      # replicas: 3
       resources:
          limits:
             # appropriate for a 2GB RPi
@@ -45,10 +51,14 @@ services:
     restart: always
     ports:
     - 80:80
+    - 443:443
     depends_on:
     - backend
     networks:
     - frontnet
+    secrets:
+    - sslcert
+    - sslkey
 
 networks:
   backnet:
@@ -61,6 +71,10 @@ secrets:
     file: ../passwords/readonly.txt
   pgadmin:
     file: ../passwords/pgadmin.txt
+  sslcert:
+    file: ../ssl/server.crt
+  sslkey:
+    file: ../ssl/server.key
 
 volumes:
   pgdata:

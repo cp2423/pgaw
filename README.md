@@ -126,6 +126,27 @@ and creates the database, which takes a little while. On future
 runs if it sees a database is already present in the mounted 
 volume these steps are skipped, thus providing persistence.
 
+## SSL support
+
+Adding SSL support was a challenge. I made this much more difficult
+than it needed to be by insisting that the key file
+be stored in a completely separate directory to avoid it accidentally
+being pushed into GitHub. I updated `.gitignore` to exclude `*.key`
+but I wanted to learn a "belt and braces" approach using Docker secrets.
+
+Note that Docker ignores symlinks since they argue these would create a
+container which is not perfectly replicable which is sort of 
+understandable I guess.
+
+A key lesson was that some features of compose files are *only* valid
+when running Docker in swarm mode - in particular 
+[setting uid, gid and mode on a secret](https://github.com/docker/compose/issues/9648)
+is not a thing in Docker Compose. This matters because postgres
+requires either the postgres user or root to own the key file.
+
+The solution was to `chown` the key file on the host as Docker Compose
+copies across the ownership etc when running on Linux.
+
 ## Useful resources
 https://kbroman.org/github_tutorial/ = clearly written guide helped jog the
 memory about getting git working
