@@ -56,10 +56,22 @@ services:
     - backend
     networks:
     - frontnet
-    secrets:
-    - sslcert
-    - sslkey
+ #   secrets:
+ #   - sslcert
+ #   - sslkey
+    volumes:
+    - www:/var/www/certbot/:ro
+    - ssl:/etc/nginx/ssl/:ro
 
+  certbot:
+    image: certbot/certbot:v2.10.0
+    depends_on:
+    - proxy
+    networks:
+    - frontnet
+    volumes:
+    - www:/var/www/certbot/:rw
+    - ssl:/etc/letsencrypt/:rw
 networks:
   backnet:
   frontnet:
@@ -78,3 +90,7 @@ secrets:
 
 volumes:
   pgdata:
+  ssl:
+    name: "certbot-ssl"
+  www:
+    name: "certbot-www"
