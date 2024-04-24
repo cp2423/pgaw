@@ -4,19 +4,16 @@ services:
     image: nginx:1.25-alpine
     ports:
       - 80:80
-      - 443:443
     restart: always
     volumes:
       - ./nginx:/etc/nginx/conf.d/:ro
-      - www:/var/www/certbot/:ro
+      - certbot-www:/var/www/certbot/:ro
   certbot:
     image: certbot/certbot:v2.10.0
     volumes:
-      - www:/var/www/certbot/:rw
-      - ssl:/etc/letsencrypt/:rw
+      - certbot-www:/var/www/certbot/:rw
+      - /etc/letsencrypt/:/etc/letsencrypt/:rw
 
 volumes:
-  ssl:
-    name: "certbot-ssl"
-  www:
-    name: "certbot-www"
+  certbot-www:
+    name: certbot-www
