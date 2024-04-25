@@ -39,7 +39,7 @@ services:
     secrets:
       - pgadmin
     deploy:
-      # replicas: 3
+      replicas: 3
       resources:
          limits:
             # appropriate for a 2GB RPi
@@ -59,6 +59,8 @@ services:
     secrets:
     - sslcert
     - sslkey
+    volumes:
+    - certbot-www:/var/www/certbot/:ro
 
 networks:
   backnet:
@@ -72,9 +74,11 @@ secrets:
   pgadmin:
     file: ../passwords/pgadmin.txt
   sslcert:
-    file: ../ssl/server.crt
+    file: /etc/letsencrypt/live/postgres.crwpitcher.com/cert.pem
   sslkey:
-    file: ../ssl/server.key
+    file: /etc/letsencrypt/live/postgres.crwpitcher.com/privkey.pem
 
 volumes:
   pgdata:
+  certbot-www:
+    external: true
