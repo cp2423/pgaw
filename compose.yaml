@@ -1,7 +1,7 @@
 services:
   db:
     build: db
-#    restart: always
+    restart: always
     # image manual says to set shared memory limit
     shm_size: 128mb
     # expose port for direct connections
@@ -48,7 +48,7 @@ services:
 
   proxy:
     build: proxy
- #   restart: always
+    restart: always
     ports:
     - 80:80
     - 443:443
