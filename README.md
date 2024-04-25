@@ -42,18 +42,15 @@ By default RPi OS does not have "cgroup memory" enabled so following
 console=serial0,115200 console=tty1 root=PARTUUID=28ffafa1-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_enable=cpuset cgroup_enable=memory
 ```
 
-Then create a passwords folder. This should be in `~` and sibling to `pgaw`
-to ensure these don't get commited into git by mistake:
+Then create a passwords script `/etc/profile.d/pgaw.sh` with:
 
 ```
-mkdir passwords
-echo "<insert password here>" > dbroot.txt
-echo "<insert password here>" > pgadmin.txt
-echo "<insert password here>" > readonly.txt
+export DBROOT=<insert database root password>
+export DBUSER=<insert password for readonly database user>
+export PGADMIN=<insert password for default login to pgadmin>
 ```
 
-These are the root postgres, pgadmin admin and database user passwords
-respectively.
+Remember to log out to take effect.
 
 Finally, do `./runme.sh`
 
@@ -200,3 +197,6 @@ this project
 
 * https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/
 includes how to automagically keep letsencrypt certificates fresh
+
+* https://eff-certbot.readthedocs.io/en/stable/using.html#certbot-command-line-options
+letsencrypt certbot command line options

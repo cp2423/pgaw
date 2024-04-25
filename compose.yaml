@@ -68,11 +68,11 @@ networks:
 
 secrets:
   dbroot:
-    file: ../passwords/dbroot.txt
+    environment: "DBROOT"
   readonly:
-    file: ../passwords/readonly.txt
+    environment: "DBUSER"
   pgadmin:
-    file: ../passwords/pgadmin.txt
+    environment: "PGADMIN"
   sslcert:
     file: /etc/letsencrypt/live/postgres.crwpitcher.com/cert.pem
   sslkey:
