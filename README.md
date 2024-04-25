@@ -42,6 +42,20 @@ By default RPi OS does not have "cgroup memory" enabled so following
 console=serial0,115200 console=tty1 root=PARTUUID=28ffafa1-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_enable=cpuset cgroup_enable=memory
 ```
 
+Then create a passwords folder. This should be in `~` and sibling to `pgaw`
+to ensure these don't get commited into git by mistake:
+
+```
+mkdir passwords
+echo "<insert password here>" > dbroot.txt
+echo "<insert password here>" > pgadmin.txt
+echo "<insert password here>" > readonly.txt
+```
+
+These are the root postgres, pgadmin admin and database user passwords
+respectively.
+
+Finally, do `./runme.sh`
 
 ### Database
 
@@ -126,7 +140,7 @@ and creates the database, which takes a little while. On future
 runs if it sees a database is already present in the mounted 
 volume these steps are skipped, thus providing persistence.
 
-## SSL support
+## SSL support - self-signed
 
 Adding SSL support was a challenge. I made this much more difficult
 than it needed to be by insisting that the key file
@@ -147,6 +161,28 @@ requires either the postgres user or root to own the key file.
 The solution was to `chown` the key file on the host as Docker Compose
 copies across the ownership etc when running on Linux.
 
+## SSL support - letsencrypt
+
+Having signed certificates is obviously better so added letsencrypt into
+the mix. Recommended way of doing so is to install via snap but this
+did not work well in the context of containerised system so switched to
+using their Docker image instead as described in [this blog]
+(https://mindsers.blog/en/post/https-using-nginx-certbot-docker/).
+
+There is a *chicken and egg* issue where the certbot needs access to
+the web to register the host and download the certificates. So an nginx
+container needs to be place serving HTTP. *Then* the certificates can be
+added to the nginx config to serve HTTPS and to postgres to also offer 
+SSL connections. The `runme.sh` resolves this problem by spinning up a
+HTTP only nginx container to do certification stuff (initial acquisition
+or renewal) which gets killed before the main app containers are started.
+
+[This article](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
+helped show how to configure SSL in nginx.
+
+As before there was some faff with permissions and owner on the certificate
+files which are also handled using the `runme.sh` script. 
+
 ## Useful resources
 
 * https://kbroman.org/github_tutorial/ clearly written guide helped jog the
@@ -159,7 +195,7 @@ adding option 3 "ip_hash;" into nginx config was crucial
 gunicorn app behind nginx complete with detailed example config file
 
 * https://github.com/docker/awesome-compose/tree/master examples of docker 
-* configs for various apps eg used nginx-flask-mysql as jumping off point for
+configs for various apps eg used nginx-flask-mysql as jumping off point for
 this project
 
 * https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/
