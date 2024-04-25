@@ -148,6 +148,7 @@ The solution was to `chown` the key file on the host as Docker Compose
 copies across the ownership etc when running on Linux.
 
 ## Useful resources
+
 * https://kbroman.org/github_tutorial/ clearly written guide helped jog the
 memory about getting git working
 
@@ -157,8 +158,8 @@ adding option 3 "ip_hash;" into nginx config was crucial
 * https://docs.gunicorn.org/en/latest/deploy.html shows how to deploy a
 gunicorn app behind nginx complete with detailed example config file
 
-* https://github.com/docker/awesome-compose/tree/master examples of docker
-configs for various apps eg used nginx-flask-mysql as jumping off point for
+* https://github.com/docker/awesome-compose/tree/master examples of docker 
+* configs for various apps eg used nginx-flask-mysql as jumping off point for
 this project
 
 * https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/
