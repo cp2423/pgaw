@@ -48,6 +48,8 @@ Then create a passwords script `/etc/profile.d/pgaw.sh` with:
 export DBROOT=<insert database root password>
 export DBUSER=<insert password for readonly database user>
 export PGADMIN=<insert password for default login to pgadmin>
+export PGDB_PASS=<insert password for pgadmin settings db>
+export PGDB_USER=<insert username for pgadmin settings db>
 ```
 
 Remember to log out to take effect.

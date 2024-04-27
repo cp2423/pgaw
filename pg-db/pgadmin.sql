@@ -1131,8 +1131,7 @@ COPY public.roles_users (user_id, role_id) FROM stdin;
 --
 
 COPY public.server (id, user_id, servergroup_id, name, host, port, maintenance_db, username, comment, password, role, discovery_id, db_res, bgcolor, fgcolor, service, use_ssh_tunnel, tunnel_host, tunnel_port, tunnel_username, tunnel_authentication, tunnel_identity_file, tunnel_password, save_password, shared, kerberos_conn, cloud_status, passexec_cmd, passexec_expiration, connection_params, shared_username, prepare_threshold, tunnel_keep_alive) FROM stdin;
-1	1	1	PostgreSQL	db	5432	adventureworks	readonly	\N	\N	\N	\N	adventureworks	\N	\N	\N	0	\N	22	\N	0	\N	\N	\N	\N	f	0	\N	\N	{"sslmode": "prefer", "connect_timeout": 10, "sslcert": "<STORAGE_DIR>/.postgresql/postgresql.crt", "sslkey": "<STORAGE_DIR>/.postgresql/postgresql.key"}	\N	\N	0
-2	1	1	PostgreSQL	db	5432	adventureworks	readonly	\N	\N	\N	\N	adventureworks	\N	\N	\N	0	\N	22	\N	0	\N	\N	\N	\N	f	0	\N	\N	{"sslmode": "prefer", "connect_timeout": 10, "sslcert": "<STORAGE_DIR>/.postgresql/postgresql.crt", "sslkey": "<STORAGE_DIR>/.postgresql/postgresql.key"}	\N	\N	0
+6	1	1	Postgres	aw-db	5432	postgres	readonly	\N	\N	\N	\N	adventureworks	\N	\N	\N	0	\N	22	\N	0	\N	\N	0	t	f	0	\N	\N	{"sslmode": "prefer", "connect_timeout": 10, "sslcert": "<STORAGE_DIR>/.postgresql/postgresql.crt", "sslkey": "<STORAGE_DIR>/.postgresql/postgresql.key"}	readonly	\N	0
 \.
 
 
@@ -1150,6 +1149,9 @@ COPY public.servergroup (id, user_id, name) FROM stdin;
 --
 
 COPY public.setting (user_id, setting, value) FROM stdin;
+1	LastUpdateCheck	20240427
+1	Browser/Layout	{"dockbox":{"id":"+2","size":200,"mode":"horizontal","children":[{"id":"+3","size":20,"tabs":[{"id":"id-object-explorer"}],"group":"object-explorer","activeId":"id-object-explorer"},{"id":"id-main","size":80,"tabs":[{"id":"id-dashboard"},{"id":"id-properties"},{"id":"id-sql"},{"id":"id-statistics"},{"id":"id-dependencies"},{"id":"id-dependents"},{"id":"id-processes"}],"group":"playground","activeId":"id-dashboard"}]},"floatbox":{"id":"+7","size":0,"mode":"float","children":[{"id":"+10","size":200,"tabs":[{"id":"id-edit-properties178"}],"group":"dialogs","activeId":"id-edit-properties178","x":610,"y":53.8,"z":1,"w":700,"h":550}]},"windowbox":{"id":"+8","size":0,"mode":"window","children":[]},"maxbox":{"id":"+9","size":1,"mode":"maximize","children":[]}}
+1	browser_tree_state	{"6": {"paths": ["browser,server_group_1,server_6,coll-database_6,database_16384"], "selected": {"server_6": "database_16384", "database_16384": "database_16384"}, "conn_status": {"database_16384": 1}, "is_opened": {"database_16384": 1}}}
 \.
 
 
@@ -1166,7 +1168,7 @@ COPY public.sharedserver (id, user_id, server_owner, servergroup_id, name, host,
 --
 
 COPY public."user" (id, email, password, active, confirmed_at, masterpass_check, username, auth_source, fs_uniquifier, locked, login_attempts) FROM stdin;
-1	admin@foo.com	$pbkdf2-sha512$25000$ZkzJuVcqhRACAKD0fg/hnA$tMUAYM3axlKAEzUmVq5OyPbewCp0RwFHrc/7alftpWJW84axgaCGXss2caLP.Np75ZZ0znL/6t5.FBd5tyxVPg	t	\N	\N	admin@foo.com	internal	0dceb75380544219a922a93373a61fbd	f	0
+1	admin@foo.com	$pbkdf2-sha512$25000$ZkzJuVcqhRACAKD0fg/hnA$tMUAYM3axlKAEzUmVq5OyPbewCp0RwFHrc/7alftpWJW84axgaCGXss2caLP.Np75ZZ0znL/6t5.FBd5tyxVPg	t	\N	38507570686230673763635656346359682f6248705244616b5165426635527357444b4575412b33412b66324b30324b67773d3d	admin@foo.com	internal	0dceb75380544219a922a93373a61fbd	f	0
 \.
 
 
@@ -1191,6 +1193,7 @@ COPY public.user_mfa (user_id, mfa_auth, options) FROM stdin;
 --
 
 COPY public.user_preferences (pid, uid, value) FROM stdin;
+121	1	en
 \.
 
 
@@ -1242,7 +1245,7 @@ SELECT pg_catalog.setval('public.role_id_seq', 2, true);
 -- Name: server_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.server_id_seq', 2, true);
+SELECT pg_catalog.setval('public.server_id_seq', 6, true);
 
 
 --
