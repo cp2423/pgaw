@@ -2,7 +2,7 @@
 This is a resilient server providing the Adventureworks database
 running on postgres in Docker.
 
-I had a need for an SQL server that users could use to practise writing
+I had a need for an SQL server for users to practise writing
 queries. Having previously used pgadmin for this puprose I found that, 
 whilst it is an excellent tool, it can eat up memory and ultimately OOM
 the server, especially if a user writes a query which returns an
@@ -123,6 +123,27 @@ the compose file seemed to make all the difference. This
 can be tested by running `docker stats` in parallel when 
 the containers are up, which clearly shows the maximum 
 amount of memory each container is allowed.
+
+#### Shared database
+
+Having replicated instances of pgadmin requires having a shared 
+database for settings such as user logins, otherwise this data
+will end up distributed across the different containers!
+
+This was resolved by adding in an extra postgres container
+for this purpose and writing a tiny python script in
+`backend/config_system.py` which is mounted into each pgadmin
+container to include the URI of the shared database.
+
+Three pgadmin containers trying to initialise this database
+was an issue. To resolve, temporarily ran just one backend
+to allow this then dumped the database into a script pushed
+into the postgres container. To do so requires the postgres
+user:
+
+```
+docker exec pgaw-pg-db-1 sh -c "su postgres -c 'pg_dump pgadmin'" > pgadmin.sql
+```
 
 ### postgres config notes
 
