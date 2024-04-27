@@ -53,7 +53,7 @@ services:
 
   # pgadmin4 containers (usage capped)
   backend:
-    build: backend
+    image: dpage/pgadmin4:8.5
     restart: always
     depends_on:
       pg-db:
@@ -80,7 +80,7 @@ services:
 
   # nginx with ssl reverse proxy and load balancing
   proxy:
-    build: proxy
+    image: nginx:1.25.5-alpine
     restart: always
     ports:
       - 80:80
@@ -95,6 +95,7 @@ services:
       - sslkey
     volumes:
       - certbot-www:/var/www/certbot/:ro
+      - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
 
 networks:
   backnet:

@@ -13,3 +13,6 @@ def get_secret(secret):
 d = {s: get_secret(s) for s in SECRETS}
 
 CONFIG_DATABASE_URI = f"postgresql://postgres:{d['pgdb-pass']}@pg-db:5432/pgadmin"
+
+# default is only 3
+MAX_LOGIN_ATTEMPTS = 10
