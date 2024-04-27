@@ -2,7 +2,7 @@
 This is a resilient server providing the Adventureworks database
 running on postgres in Docker.
 
-I had a need for an SQL server that users could use to practise writing
+I had a need for an SQL server for users to practise writing
 queries. Having previously used pgadmin for this puprose I found that, 
 whilst it is an excellent tool, it can eat up memory and ultimately OOM
 the server, especially if a user writes a query which returns an
@@ -42,6 +42,19 @@ By default RPi OS does not have "cgroup memory" enabled so following
 console=serial0,115200 console=tty1 root=PARTUUID=28ffafa1-02 rootfstype=ext4 fsck.repair=yes rootwait cfg80211.ieee80211_regdom=GB cgroup_enable=cpuset cgroup_enable=memory
 ```
 
+Then create a passwords script `/etc/profile.d/pgaw.sh` with:
+
+```
+export DBROOT=<insert database root password>
+export DBUSER=<insert password for readonly database user>
+export PGADMIN=<insert password for default login to pgadmin>
+export PGDB_PASS=<insert password for pgadmin settings db>
+export PGDB_USER=<insert username for pgadmin settings db>
+```
+
+Remember to log out to take effect.
+
+Finally, do `./runme.sh`
 
 ### Database
 
@@ -113,6 +126,27 @@ can be tested by running `docker stats` in parallel when
 the containers are up, which clearly shows the maximum 
 amount of memory each container is allowed.
 
+#### Shared database
+
+Having replicated instances of pgadmin requires having a shared 
+database for settings such as user logins, otherwise this data
+will end up distributed across the different containers!
+
+This was resolved by adding in an extra postgres container
+for this purpose and writing a tiny python script in
+`backend/config_system.py` which is mounted into each pgadmin
+container to include the URI of the shared database.
+
+Three pgadmin containers trying to initialise this database
+was an issue. To resolve, temporarily ran just one backend
+to allow this then dumped the database into a script pushed
+into the postgres container. To do so requires the postgres
+user:
+
+```
+docker exec pgaw-pg-db-1 sh -c "su postgres -c 'pg_dump pgadmin'" > pgadmin.sql
+```
+
 ### postgres config notes
 
 The [release notes](https://hub.docker.com/_/postgres) of the
@@ -126,7 +160,7 @@ and creates the database, which takes a little while. On future
 runs if it sees a database is already present in the mounted 
 volume these steps are skipped, thus providing persistence.
 
-## SSL support
+## SSL support - self-signed
 
 Adding SSL support was a challenge. I made this much more difficult
 than it needed to be by insisting that the key file
@@ -147,6 +181,28 @@ requires either the postgres user or root to own the key file.
 The solution was to `chown` the key file on the host as Docker Compose
 copies across the ownership etc when running on Linux.
 
+## SSL support - letsencrypt
+
+Having signed certificates is obviously better so added letsencrypt into
+the mix. Recommended way of doing so is to install via snap but this
+did not work well in the context of containerised system so switched to
+using their Docker image instead as described in [this blog]
+(https://mindsers.blog/en/post/https-using-nginx-certbot-docker/).
+
+There is a *chicken and egg* issue where the certbot needs access to
+the web to register the host and download the certificates. So an nginx
+container needs to be place serving HTTP. *Then* the certificates can be
+added to the nginx config to serve HTTPS and to postgres to also offer 
+SSL connections. The `runme.sh` resolves this problem by spinning up a
+HTTP only nginx container to do certification stuff (initial acquisition
+or renewal) which gets killed before the main app containers are started.
+
+[This article](https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-with-ssl-as-a-reverse-proxy-for-jenkins)
+helped show how to configure SSL in nginx.
+
+As before there was some faff with permissions and owner on the certificate
+files which are also handled using the `runme.sh` script. 
+
 ## Useful resources
 
 * https://kbroman.org/github_tutorial/ clearly written guide helped jog the
@@ -159,8 +215,11 @@ adding option 3 "ip_hash;" into nginx config was crucial
 gunicorn app behind nginx complete with detailed example config file
 
 * https://github.com/docker/awesome-compose/tree/master examples of docker 
-* configs for various apps eg used nginx-flask-mysql as jumping off point for
+configs for various apps eg used nginx-flask-mysql as jumping off point for
 this project
 
 * https://stackify.com/how-to-configure-https-for-an-nginx-docker-container/
 includes how to automagically keep letsencrypt certificates fresh
+
+* https://eff-certbot.readthedocs.io/en/stable/using.html#certbot-command-line-options
+letsencrypt certbot command line options
