@@ -1,0 +1,11 @@
+from os import path
+SECRETS = path.join("run","secrets")
+
+def get_secret(secret):
+  secret_path = path.join(SECRETS, secret)
+  if path.isfile(secret_path):
+    with open(secret_path) as f:
+      return f.read()
+
+{s: get_secret(s) for s in ["PGDB_USER","PGDB_PASS"]}
+

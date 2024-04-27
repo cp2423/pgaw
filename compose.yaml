@@ -1,10 +1,11 @@
 services:
-  db:
-    build: db
+  # adventureworks db on postgres
+  aw-db:
+    build: aw-db
     restart: always
     # image manual says to set shared memory limit
     shm_size: 128mb
-    # expose port for direct connections
+    # expose port for direct connections from internet
     ports:
       - 5432:5432
     networks:
@@ -15,7 +16,7 @@ services:
       -c ssl_key_file=/run/secrets/sslkey
     environment:
       - POSTGRES_DB=adventureworks
-      - POSTGRES_PASSWORD=/run/secrets/dbroot
+      - POSTGRES_PASSWORD_FILE=/run/secrets/dbroot
       - READONLY_PWD_FILE=/run/secrets/readonly
     secrets:
       - dbroot
@@ -23,13 +24,40 @@ services:
       - sslcert
       - sslkey
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - awdb-data:/var/lib/postgresql/data
 
+  # db for pgadmin4 data etc on postgres
+  pg-db:
+    image: postgres:16.2
+    restart: always
+    shm_size: 128mb
+    # CONTAINER_PORT only, no internet access
+    ports:
+      - 5432
+    networks:
+      - backnet
+    environment:
+      - POSTGRES_DB=pgadmin
+      - POSTGRES_PASSWORD_FILE=/run/secrets/pgdb-pass
+    secrets:
+      - pgdb-pass
+    healthcheck:
+      test: ["CMD-SHELL", "su postgres -c pg_isready"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - pgdb-data:/var/lib/postgresql/data
+      - ./pg-db/pgadmin.sql:/docker-entrypoint-initdb.d/pgadmin.sql
+
+  # pgadmin4 containers (usage capped)
   backend:
     build: backend
     restart: always
     depends_on:
-      - db
+      pg-db:
+        condition: service_healthy
     networks:
       - backnet
       - frontnet
@@ -38,6 +66,7 @@ services:
       - PGADMIN_DEFAULT_PASSWORD_FILE=/run/secrets/pgadmin
     secrets:
       - pgadmin
+      - pgdb-pass
     deploy:
       replicas: 3
       resources:
@@ -45,40 +74,54 @@ services:
             # appropriate for a 2GB RPi
             cpus: '0.5'
             memory: 400m
+    volumes:
+      # mount config file with pg-db uri option
+      - ./backend/config_system.py:/etc/pgadmin/config_system.py
 
+  # nginx with ssl reverse proxy and load balancing
   proxy:
     build: proxy
     restart: always
     ports:
-    - 80:80
-    - 443:443
+      - 80:80
+      - 443:443
     depends_on:
-    - backend
+      # nginx fails on start if cannot find backend
+      - backend
     networks:
-    - frontnet
+      - frontnet
     secrets:
-    - sslcert
-    - sslkey
+      - sslcert
+      - sslkey
     volumes:
-    - certbot-www:/var/www/certbot/:ro
+      - certbot-www:/var/www/certbot/:ro
 
 networks:
   backnet:
   frontnet:
 
 secrets:
+  # aw-db default user and password
   dbroot:
     environment: "DBROOT"
   readonly:
     environment: "DBUSER"
+  # pgadmin admin password
   pgadmin:
     environment: "PGADMIN"
+  # pg-db password
+  pgdb-pass:
+    environment: "PGDB_PASS"
+  # letsencrypt certbot stores cert and key on host
   sslcert:
     file: /etc/letsencrypt/live/postgres.crwpitcher.com/cert.pem
   sslkey:
     file: /etc/letsencrypt/live/postgres.crwpitcher.com/privkey.pem
 
 volumes:
-  pgdata:
+  # database persistence for advertureworks and pgadmin4
+  awdb-data:
+  pgdb-data:
   certbot-www:
+    # "inherit" data from the initial nginx webserver
     external: true

@@ -1,0 +1,17 @@
+from os import path
+
+SECRETS = ["pgdb-pass", "pgdb-user"]
+
+def get_secret(secret):
+  secret_path = path.join("/run", "secrets", secret)
+  print(f"secret_path = {secret_path}")
+  if path.isfile(secret_path):
+    with open(secret_path) as f:
+      return f.read()
+
+d = {s: get_secret(s) for s in SECRETS}
+
+n
+n
+CONFIG_DATABASE_URI = f"postgresql://{d['pgdb-user']}:{d['pgdb-pass']}@pg-db:5432/"
+print(CONFIG_DATABASE_URI)
