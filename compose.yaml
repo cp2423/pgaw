@@ -77,6 +77,8 @@ services:
     volumes:
       # mount config file with pg-db uri option
       - ./backend/config_system.py:/etc/pgadmin/config_system.py
+      # script for adding users to pgadmin
+      - ./backend/add_users.sh:/pgadmin4/add_users.sh
 
   # nginx with ssl reverse proxy and load balancing
   proxy:
