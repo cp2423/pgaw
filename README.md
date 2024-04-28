@@ -1,6 +1,6 @@
 # pgaw
 This is a resilient server providing the Adventureworks database
-running on postgres in Docker.
+running on Postgres in Docker.
 
 I had a need for an SQL server for users to practise writing
 queries. Having previously used pgadmin for this puprose I found that, 
@@ -13,11 +13,11 @@ this. I also wanted to gain some more experience playing around with Docker
 and Compose.
 
 Key lessons:
-- **Docker Compose** in particular lifecycle of a container eg effect of
+- *Docker Compose* in particular lifecycle of a container eg effect of
 `up`, `down`, `down -v` (which will remove volumes too which was necessary
 to recreate the database) also faffing around with replicas and secrets
-- **Architecture** making nginx load balancing work across a Docker network
-- **Shell scripting** bits and bobs
+- *Architecture* making nginx load balancing work across a Docker network
+- *Shell scripting* bits and bobs
 
 ## Prerequesites
 
