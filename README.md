@@ -34,6 +34,8 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 sudo apt install docker-compose-plugin git
 git clone https://github.com/cp2423/pgaw.git
+sudo systemctl start docker
+sudo systemctl enable docker
 ```
 
 By default RPi OS does not have "cgroup memory" enabled so following
