@@ -17,6 +17,7 @@ Key lessons:
 `up`, `down`, `down -v` (which will remove volumes too which was necessary
 to recreate the database) also faffing around with replicas and secrets
 - **Architecture** making nginx load balancing work across a Docker network
+- **Shell scripting** bits and bobs
 
 ## Prerequesites
 
@@ -146,6 +147,19 @@ user:
 ```
 docker exec pgaw-pg-db-1 sh -c "su postgres -c 'pg_dump pgadmin'" > pgadmin.sql
 ```
+
+#### Adding users
+
+Made a tiny shell script which uses [setup.py in pgadmin]
+(https://www.pgadmin.org/docs/pgadmin4/latest/user_management.html#using-setup-py-command-line-script)
+which exists for exactly this purpose.
+
+It can be used by doing:
+```
+docker exec -i pgaw-backend-1 sh -c "/pgadmin4/add_users.sh" < users
+```
+where `users` is a file containing a simple list of email addresses, 
+one per line. NB it is strangely slow.
 
 ### postgres config notes
 
