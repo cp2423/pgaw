@@ -1,5 +1,5 @@
 # pgaw
-This is a resilient server providing the Adventureworks database
+This is a resilient server providing the *Adventureworks* database
 running on Postgres in Docker.
 
 I had a need for an SQL server for users to practise writing
@@ -18,6 +18,7 @@ Key lessons:
 to recreate the database) also faffing around with replicas and secrets
 - *Architecture* making nginx load balancing work across a Docker network
 - *Shell scripting* bits and bobs
+- *Git workflow* dusting off knowledge of branch management
 
 ## Prerequesites
 
